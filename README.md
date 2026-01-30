@@ -1,155 +1,187 @@
-In this project I doing full 6 dof teleoperation using keyoard inputs in both task space control using inverse kinematics and joint spcae control.
+Cartesian Task-Space Teleoperation Controller (ROS 2)
 
-For both control the initial robot launch steps are same.
+A ROS 2-based Cartesian task-space teleoperation framework for a 6-DOF robotic manipulator.
+This project enables incremental, safe end-effector control in task space, visualized in RViz, and is architected to seamlessly support future force-compliance (admittance / impedance) control.
 
-steps:
-1. run ros2 launch dsr_a0509_description display.launch.py in one terminal
-Rviz will open and joint state publisher gui will open.
-2. now in rviz go to-->file-->open config, and select the config file in this path '/src/dsr_a0509_description/teleop.rviz'.
-3. Now close the joint state publisher gui before moving into teleoperation, because teleopeartion nodes also /joint_states for communication.
+ **Features**
 
-Task_space_teleoperation:
-1. Once the rviz is setted, then in another terminal run, ros2 run cartesian_teleop_controller task_space_teleop, then based on the keyboard input instaructions move the robot.
-"Press\n\n"
-            "A/D : +X  / -X\n"
-            "S/W : +Y  / -Y\n"
-            "F/R : +Z  / -Z\n"
-            "I/K : +Rx / -Rx\n"
-            "J/L : +Ry / -Ry\n"
-            "U/O : +Rz / -Rz\n"
-            "Q   : stop teleop and quit"
+ Full 6-DOF Cartesian teleoperation
 
-The structured and detailed explanation for 
-  ○ Node architecture
-  ○ Control logic
+ Jacobian-based task-space inverse kinematics
 
-  ○ Control strategy used
-  ○ Why it is safe
-  ○ Where force-compliance would plug in.
+ Clean separation of input, control, and robot description
 
-  are mentioned in document named 6-DOF Task-Space Teleoperation Architecture.pdf . Kindly refer to this document for detailed understanding.
+ RViz-only safe execution (no torque commands)
 
-  Joint_space_teleoperation:
-  1. Follow the same steps for rviz setting.
-  2. Now in another terminal run , ros2 run cartesian_teleop_controller joint_space_controller 
-  3. then in another terminal run , ros2 run teleop_input keyboard_teleop and follow the keyboard input instructions.
-  "A/D : +J1 / -J1\n"
-            "W/S : +J2 / -j2\n"
-            "Q/E : +J3 / -J3\n"
-            "I/K : +J4 / -J4\n"
-            "J/L : +J5 / -J5\n"
-            "U/O : +J6 / -J6\n"
+ Compliance-ready architecture (no refactor required later)
 
-The structured and detailed explanation for 
-  ○ Node architecture
-  ○ Control logic
+ ROS 2 Python packages (Humble-compatible)
 
-  ○ Control strategy used
-  ○ Why it is safe
-  ○ Where force-compliance would plug in.
+** System Architecture (High Level)
+**
+User Input (Keyboard / Haptic)
+        ↓
+Cartesian Increment Δx
+        ↓
+(Optional Compliance Layer)
+        ↓
+Jacobian Pseudo-Inverse IK (J⁺)
+        ↓
+Joint Increment Δq
+        ↓
+Robot Model (RViz / Hardware)
 
-  are mentioned in document named Joint Space Teleop .pdf . Kindly refer to this document for detailed understanding.
-
-   project_root
-├──  cartesian_teleop_controller
-│   ├──  cartesian_teleop_controller
+** Project Folder Structure
+**
+├── cartesian_teleop_controller/
+│   ├── cartesian_teleop_controller/
 │   │   ├── __init__.py
 │   │   ├── ik_controller.py
-│   │   ├── joint_space_controller.py*
-│   │   ├── task_space_control.py
-│   │   └── task_space_teleop.py*
-│   ├──  resource
-│   ├──  test
+│   │   ├── joint_space_controller.py
+│   │   ├── task_space_ik_control.py
+│   │   ├── task_space_teleop.py
+│   │   └── __pycache__/
+│   ├── resource/
+│   ├── test/
 │   ├── package.xml
-│   ├── setup.py
-│   └── setup.cfg
+│   ├── setup.cfg
+│   └── setup.py
 │
-├──  dsr_a0509_description
-│   ├──  config
-│   ├──  include
-│   ├──  launch
-│   │   ├── display.launch.py*
+├── dsr_a0509_description/
+│   ├── config/
+│   ├── include/
+│   ├── launch/
+│   │   ├── display.launch.py
 │   │   └── display_teleop.launch.py
-│   ├──  meshes
-│   ├──  ros2_control
-│   ├──  src
-│   ├──  urdf
-│   │   └── a0509.urdf.xacro*
-│   ├──  xacro
-│   │   └── macro.a0509.white.xacro*
+│   ├── meshes/
+│   ├── ros2_control/
+│   ├── src/
+│   ├── urdf/
+│   │   └── a0509.urdf.xacro
+│   ├── xacro/
+│   │   └── macro.a0509.white.xacro
 │   ├── CMakeLists.txt
 │   ├── package.xml
 │   └── teleop.rviz
 │
-├──  teleop_input
-│   ├──  teleop_input
+├── teleop_input/
+│   ├── teleop_input/
 │   │   ├── __init__.py
-│   │   └── keyboard_teleop.py*
-│   ├──  resource
-│   ├──  test
+│   │   ├── keyboard_teleop.py
+│   │   └── __pycache__/
+│   ├── resource/
+│   ├── test/
 │   ├── package.xml
-│   ├── setup.py
-│   └── setup.cfg
+│   ├── setup.cfg
+│   └── setup.py
 │
-├──  picture
-├──  robot_bringup
+├── robot_bringup/
+├── picture/
 └── README.md
-└── 6-DOF Task-Space Teleoperation Architecture.pdf*
-└── Joint Space Teleop .pdf*
 
-Package Descriptions
+**Package Overview
+**
+**cartesian_teleop_controller**
 
-cartesian_teleop_controller:
+Core control and kinematics package
 
-Contains all task-space and joint-space control logic.
+Handles all task-space and joint-space control logic.
 
-Numerical Jacobian computation
+**Key files
+**
+task_space_teleop.py
+Task-space teleoperation control loop
 
-Jacobian pseudoinverse IK
+joint_space_controller.py
+joint-space teleoperation control loop
 
-Task-space teleoperation pipeline
+Ignore other files.Because they are for development.
 
-Joint state publishing (/joint_states)
+**dsr_a0509_description
+**
+Robot model and visualization
 
-This is the core control package.
+Contains the complete URDF/Xacro description, meshes, and RViz configuration.
 
-dsr_a0509_description:
+**Key files
+**
+urdf/a0509.urdf.xacro – main robot description
 
-Robot description and visualization package.
+xacro/macro.a0509.white.xacro – reusable macros
 
-URDF/XACRO model of the robot
+launch/display.launch.py – RViz visualization
 
-Meshes and visual assets
+teleop.rviz – preconfigured RViz layout
 
-RViz configuration
+**teleop_input**
 
-Display and teleop launch files
+User input abstraction
 
-Used by:
+Responsible for mapping keyboard input → Cartesian motion commands.
 
-robot_state_publisher
+**Key file
+**
+keyboard_teleop.py – keyboard-based teleoperation used forjoint-space teleoperation control loop
 
-RViz visualization
+**robot_bringup
+**
+Reserved for real robot integration, hardware drivers, and controller startup.
 
-IK model loading (IKPy)
+**Teleoperation Key Mapping
+**
+Translation
+A / D  : +X / -X
+W / S  : +Y / -Y
+F / R  : +Z / -Z
 
-teleop_input:
+Rotation
+I / K  : +Rx / -Rx
+J / L  : +Ry / -Ry
+U / O  : +Rz / -Rz
 
-Dedicated input abstraction package.
+Q      : Quit
 
-Keyboard teleoperation logic
+**Control Strategy & Safety
+**
+Control Strategy Used
 
-Clean separation between input and control
+Incremental Cartesian task-space control
 
-Easily extendable to joystick / haptic devices
+Jacobian pseudo-inverse based IK
 
-robot_bringup:
+No direct torque or velocity commands in RViz
 
-(Reserved / optional)
+**Why This Is Safe
+**
+Small Δx steps prevent sudden jumps
 
-Future hardware bringup
+No torque control in simulation
 
-Controller startup
+Joint limits enforced via URDF
 
-Sensor integration
+Visualization-only execution
 
+** Intended Use Cases
+**
+Cartesian teleoperation research
+
+Medical robotics (ultrasound, rehabilitation)
+
+Task-space controller validation
+
+Simulation-first development before hardware deployment
+
+** Future Extensions
+**
+Haptic device integration
+
+Real robot hardware interface
+
+Force–torque sensor feedback
+
+Singularity-aware Cartesian damping
+
+**Author**
+
+Balachandar
+Robotics Engineer – Task-Space Control, Teleoperation, Medical Robotics
