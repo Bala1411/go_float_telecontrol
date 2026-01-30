@@ -221,6 +221,8 @@ Q     : Stop teleoperation and quit
 ```
 
 The robot will move **incrementally and safely** in task space, visualized entirely in **RViz**.
+<img width="1832" height="323" alt="task_space_teleop" src="https://github.com/user-attachments/assets/05bafd84-4289-4c2d-9eec-00a57d9f98da" />
+
 
 ### Detailed Design Reference
 
@@ -270,6 +272,7 @@ I / K : +J4 / -J4
 J / L : +J5 / -J5
 U / O : +J6 / -J6
 ```
+<img width="1800" height="309" alt="joint_space_teleop" src="https://github.com/user-attachments/assets/5bcbcc52-a936-4dad-a343-3651d5a49e3e" />
 
 This mode is useful for **joint-level testing, debugging, and calibration**.
 
