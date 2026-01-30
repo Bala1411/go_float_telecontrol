@@ -155,7 +155,95 @@ are documented in the following files:
 
 ---
 
-## ▶ How to Run the Teleoperation
+##  Prerequisites
+
+The following software dependencies are required to run this project. These are derived directly from the Python imports and ROS 2 APIs used in the control and teleoperation nodes.
+
+###  System Requirements
+
+* **Ubuntu 22.04** (recommended)
+* **ROS 2 Humble Hawksbill**
+* **Python 3.10+** (default with Ubuntu 22.04)
+
+---
+
+###  ROS 2 Packages
+
+Make sure the following ROS 2 packages are installed:
+
+```bash
+sudo apt update
+sudo apt install -y \
+  ros-humble-rclpy \
+  ros-humble-geometry-msgs \
+  ros-humble-sensor-msgs \
+  ros-humble-joint-state-publisher-gui \
+  ros-humble-robot-state-publisher \
+  ros-humble-xacro \
+  ros-humble-rviz2
+```
+
+These packages provide:
+
+* ROS 2 Python client library (`rclpy`)
+* Message definitions (`Twist`, `JointState`)
+* Joint state publishing and visualization
+* Xacro-based URDF processing
+
+---
+
+###  Python Dependencies
+
+Install the required Python libraries using `pip`:
+
+```bash
+pip3 install --user numpy scipy ikpy
+```
+
+Used for:
+
+* **NumPy** – Vector/matrix operations and Jacobian math
+* **SciPy** – Rotation handling (`scipy.spatial.transform.Rotation`)
+* **IKPy** – Kinematic chain modeling and inverse kinematics
+
+---
+
+###  Kinematics & Robot Description
+
+* A valid **URDF/Xacro model** of the robot is required
+* The URDF is parsed at runtime using:
+
+  * `xacro`
+  * `ikpy.chain.Chain`
+
+Ensure the robot description package (`dsr_a0509_description`) is built and sourced:
+
+```bash
+colcon build --symlink-install
+source install/setup.bash
+```
+
+---
+
+###  Terminal / Keyboard Input Support
+
+The teleoperation nodes use low-level terminal input handling:
+
+* `termios`
+* `tty`
+
+ These are **standard Python libraries** on Linux and require no additional installation.
+
+---
+
+###  Optional (Recommended)
+
+* **RViz2** for visualization and debugging
+* A **full keyboard (no SSH input lag)** for smooth teleoperation
+
+---
+
+##  How to Run the Teleoperation
 
 This project supports **full 6-DOF teleoperation** using **keyboard inputs** in:
 
@@ -166,7 +254,7 @@ For **both modes**, the **initial robot launch and RViz setup steps are identica
 
 ---
 
-### 🔹 Common Setup (Required for Both Control Modes)
+###  Common Setup (Required for Both Control Modes)
 
 1. Launch the robot model and RViz:
 
@@ -189,7 +277,7 @@ File → Open Config → select:
 3. **Close the Joint State Publisher GUI** before starting teleoperation.
 
 > Important: Teleoperation nodes also publish and subscribe to `/joint_states`.
-> Keeping the Joint State Publisher GUI open will cause conflicts.
+> Keeping the Joint State Publisher GUI open will cause conflicts.So close that before doing teleop.
 
 ---
 
@@ -221,10 +309,10 @@ Q     : Stop teleoperation and quit
 ```
 
 The robot will move **incrementally and safely** in task space, visualized entirely in **RViz**.
-<img width="1832" height="323" alt="task_space_teleop" src="https://github.com/user-attachments/assets/05bafd84-4289-4c2d-9eec-00a57d9f98da" />
+<img width="1832" height="323" alt="task_space_teleop" src="https://github.com/user-attachments/assets/83abdb69-301f-401f-a845-e952b95e125a" />
 
 
-### Detailed Design Reference
+###  Detailed Design Reference
 
 A structured and in-depth explanation of:
 
@@ -272,7 +360,8 @@ I / K : +J4 / -J4
 J / L : +J5 / -J5
 U / O : +J6 / -J6
 ```
-<img width="1800" height="309" alt="joint_space_teleop" src="https://github.com/user-attachments/assets/5bcbcc52-a936-4dad-a343-3651d5a49e3e" />
+<img width="1800" height="309" alt="joint_space_teleop" src="https://github.com/user-attachments/assets/3598e7ba-2f3e-4276-be7e-9c395edd88c6" />
+
 
 This mode is useful for **joint-level testing, debugging, and calibration**.
 
@@ -281,4 +370,4 @@ This mode is useful for **joint-level testing, debugging, and calibration**.
 ##  Author
 
 **Balachandar P**
-Robotics Engineer – 6 DOF Task-Space Control, Teleoperation, Medical Robotics
+Robotics Engineer – Task-Space Control, 6 DOF Teleoperation, Medical Robotics
